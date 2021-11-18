@@ -1,5 +1,5 @@
 import express from 'express';
-import { movies, movieReviews, movieDetails } from './moviesData';
+import { movies, movieReviews, movieDetails, genres } from './moviesData';
 import uniqid from 'uniqid'
 
 
@@ -51,5 +51,8 @@ router.post('/:id/reviews', (req, res) => {
         });
     }
 });
+
+
+
 
 export default router;
