@@ -7,6 +7,7 @@ import authenticate from './authenticate';
 import './db';
 import './seedData';
 import usersRouter from './api/users';
+import passport from './authenticate';
 
 dotenv.config();
 
@@ -32,11 +33,12 @@ app.use(session({
 
 
 app.use(express.json());
-
+app.use(passport.initialize());
 app.use('/api/movies', moviesRouter);
 app.use('/api/genres', genresRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/movies', authenticate, moviesRouter);
+app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
 app.use(errHandler);
 
 
