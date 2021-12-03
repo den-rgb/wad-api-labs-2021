@@ -16,12 +16,16 @@ router.get('/', async (req, res) => {
 
 // register
 router.post('/',asyncHandler( async (req, res, next) => {
+    var regularExpression=/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/;
     if (!req.body.username || !req.body.password) {
       res.status(401).json({success: false, msg: 'Please pass username and password.'});
     }
     if (req.query.action === 'register') {
-      await User.create(req.body).catch(next);
-      res.status(201).json({code: 201, msg: 'Successful created new user.'     });
+        if(regularExpression.test(req.body.password)){
+            await User.create(req.body).catch(next);
+            res.status(201).json({code: 201, msg: 'Successful created new user.'  });   
+        }
+      
     } else {
       const user = await User.findByUserName(req.body.username).catch(next);
         if (!user) return res.status(401).json({ code: 401, msg: 'Authentication failed. User not found.' });
@@ -50,15 +54,29 @@ router.post('/',asyncHandler( async (req, res, next) => {
         res.status(404).json({ code: 404, msg: 'Unable to Update User' });
     }
 });
+function hasDuplicates(array) {
+    var valuesSoFar = Object.create(null);
+    for (var i = 0; i < array.length; ++i) {
+        var value = array[i];
+        if (value in valuesSoFar) {
+            return true;
+        }
+        valuesSoFar[value] = true;
+    }
+    return false;
+}
 
 router.post('/:userName/favourites', asyncHandler(async (req, res) => {
+    
     const newFavourite = req.body.id;
     const userName = req.params.userName;
     const movie = await movieModel.findByMovieDBId(newFavourite);
     const user = await User.findByUserName(userName);
-    awaituser.favourites.push(movie._id);
+    if(!hasDuplicates(user)){
+    await user.favourites.push(movie._id);
     await user.save(); 
     res.status(201).json(user); 
+    }
   }));
 
   router.get('/:userName/favourites', asyncHandler( async (req, res) => {
